@@ -1,0 +1,85 @@
+{
+  "name": "t12-858v3-g431",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [
+    ".eide/deps",
+    "Core/Src",
+    "Drivers/STM32G4xx_HAL_Driver/Src",
+    "Core/LIB/letter-shell",
+    "Core/DEBUG",
+    "Core/LIB/iqmathlib/Src",
+    "APP/Src",
+    "APP/Src/page"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [
+      {
+        "path": "startup_stm32g431xx.s"
+      }
+    ],
+    "folders": []
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "c45f1ca21364249f256b1de3eab5b927"
+  },
+  "targets": {
+    "Debug": {
+      "excludeList": [],
+      "toolchain": "GCC",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "STM32G431CBUx_FLASH_REAL.ld",
+        "useCustomScatterFile": true,
+        "storageLayout": {
+          "RAM": [],
+          "ROM": []
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "ST",
+          "cpuName": "STM32G431CB"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          ".eide/deps",
+          "Core/Inc",
+          "Drivers/CMSIS/Device/ST/STM32G4xx/Include",
+          "Drivers/CMSIS/Include",
+          "Drivers/STM32G4xx_HAL_Driver/Inc",
+          "Drivers/STM32G4xx_HAL_Driver/Inc/Legacy",
+          "Core/DEBUG",
+          "Core/LIB/letter-shell",
+          "Core/LIB/iqmathlib/Inc",
+          "Core/LIB/utilities",
+          "APP/Inc",
+          "APP/Inc/page"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": [
+          "USE_HAL_DRIVER",
+          "STM32G431xx",
+          "USE_FULL_LL_DRIVER"
+        ]
+      }
+    }
+  },
+  "version": "3.3"
+}
