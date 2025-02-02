@@ -49,34 +49,20 @@ void MY_Init(void)
     key_init();
 
     GlobalVariablesInit();          // 全局变量初始化
-    route_to(&(setting_page.page));
+    route_to(&(about_page_instance.page));
 }
 
 void MY_Loop(void)
 {
-    
     current_page->update_ui();
     __IO int32_t encoder_diff = EncoderEvent[ENCODER_1].count;
     if(encoder_diff != 0){
         EncoderEvent[ENCODER_1].count = 0;
         current_page->on_encoder_changed(-encoder_diff);
     }
-    // // //RUN_UI();
-    // if(Iron.AdcReady)
-    // {
-    //     //if(KeyEvent[ENTER].shortPress == 1){
-    //     EMAVG_run(&Iron.lowpass_temp,Iron.Temp_pu);
-    //     DrawNum(-10,-10,(uint16_t)(Iron.lowpass_temp.out*1000.0f),3,4,1);
-    //     flash();
-    //     Iron.AdcReady = 0; 
-    //     //}
-    // }
+    dispatch_keys(current_page->key_handlers);
 }
 
-void IRON_UI()
-{
-    
-}
 
 void GlobalVariablesInit(void)
 {

@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "encoder.h"
+#include "dispatch_keys.h"
 
 #define screen_height 64
 
@@ -14,7 +15,7 @@ typedef struct
     void (*exit)(void);//退出页面执行的函数，配置外设
     void (*tick)(void);
     void (*on_encoder_changed)(int32_t diff);//编码器旋转事件
-    void (*key_handle[KEY_COUNT])(void);//按键事件
+    key_handle key_handlers[KEY_COUNT];//按键事件
 }page_base;
 
 extern page_base *current_page;

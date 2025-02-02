@@ -14,6 +14,8 @@
 #include "emavg.h"
 #include "menu_page.h"
 #include "setting_page.h"
+#include "about_page.h"
+#include "dispatch_keys.h"
 
 //#include "dma.h"
 #include "main.h"
@@ -42,13 +44,11 @@ typedef struct
     uint8_t tips_index;                             //当前选择的烙铁头类型
 }Devices;
 
-extern Devices Iron,Gun;
+extern Devices Iron,Gun,*GLOBAL_DEV;
 
 void MY_Loop(void);
 void MY_Init(void);
 void ADC_handle(void);
-void IRON_UI();
-void GUN_UI();
 
 void GlobalVariablesInit(void);
 //算环路

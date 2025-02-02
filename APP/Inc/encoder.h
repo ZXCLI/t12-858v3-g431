@@ -25,10 +25,10 @@ typedef enum
 
 typedef	struct
 {
-	int32_t count;
+	__IO int32_t count;
 
-    bool left;  //左旋标志位
-  	bool right; //右旋标志位
+    __IO bool left;  //左旋标志位
+  	__IO bool right; //右旋标志位
 
   	//负责计数的变量
   	uint32_t left_timeout;  //左旋超时计数
@@ -51,9 +51,9 @@ typedef struct
 /*-------------------------------按键---------------------------------------*/
 typedef struct
 {
-    bool KeyPressed;    //按键按下标志位
-    bool shortPress;    //短按标志位
-    bool longPress;     //长按标志位
+    __IO bool KeyPressed;    //按键按下标志位
+    __IO bool shortPress;    //短按标志位
+    __IO bool longPress;     //长按标志位
 
     //负责计数的变量
     uint32_t press_count;   //按下时间计数

@@ -249,6 +249,7 @@ void TIM3_IRQHandler(void)
     {
       LL_TIM_ClearFlag_UPDATE(TIM3);
       encoder_poll();
+      key_poll();
     }
   /* USER CODE END TIM3_IRQn 0 */
   /* USER CODE BEGIN TIM3_IRQn 1 */

@@ -18,6 +18,22 @@ void menu_page_update_ui()
     for(uint16_t i = floor(top_index_value); i < page->item_count; i++)
     {
         DrawString(5, item_bottom + 4, page->items[i].text,item_height >> 4);
+        uint8_t temp_bit  = (page->items[i].ctrl.is_visible << 2) | 
+                            (page->items[i].ctrl.check_box_or_pop << 1) | 
+                            (page->items[i].ctrl.is_checked);
+        switch(temp_bit)
+        {
+            case 0b110:
+                DrawNum(110, item_bottom + 4, page->items[i].ctrl.pop_value, 
+                        getDigitCount(page->items[i].ctrl.pop_value), 1, 1);
+                break;
+            case 0b101:
+                DrawfillRoundRect(112, item_bottom + 4, 6, 6, 2);//复选框被选中,绘制中心填充
+            case 0b100:
+                DrawRoundRect(110, item_bottom + 2, 10, 10, 2);//绘制复选框轮廓
+                break;
+        }
+
         item_bottom += item_height;
         //DrawLine(2, item_bottom - item_height / 2, )
     }//绘制菜单项
@@ -30,12 +46,16 @@ void menu_page_update_ui()
         shadow_height += biased_shadow_top;
         biased_shadow_top = 0;
     }
-    if(shadow_height > 0)
+    if((shadow_height > 0) && (page->items[page->current_item].ctrl.on_click_pop == NULL))
     {
         DrawMYfillRoundRect(2, biased_shadow_top, (uint16_t)(page->shadow_width.current_value), 
                             (uint16_t)shadow_height);
     }//绘制选项框阴影
 
+    if(page->items[page->current_item].ctrl.on_click_pop != NULL)
+    {
+        page->items[page->current_item].ctrl.on_click_pop(0);//绘制弹出框
+    }//弹出框回调函数
     flash();
 }
 
@@ -119,11 +139,97 @@ void menu_page_ensure_visible(uint16_t target_index)
     }
 }
 
+//页面对编码器变化的响应
 void menu_page_on_encoder_changed(int32_t diff)
 {
-    menu_page_foucs_with_increment(diff);
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+
+    if(page->items[page->current_item].ctrl.on_click_pop != NULL)
+    {
+        //当有弹窗出现时，弹窗需要提前捕获编码器的值
+        page->items[page->current_item].ctrl.on_click_pop(diff);
+    }
+    else
+    {
+        menu_page_foucs_with_increment(diff);
+    }
+    
 }
 
+//页面对按键的响应函数
+void menu_page_enter_menu_item()
+{
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+
+    if((page->current_item < page->item_count) && (page->items[page->current_item].on_enter != NULL))
+    {
+        page->items[page->current_item].on_enter();//将页面的按键响应传递给选项，执行选项的回调函数
+    }
+}
+
+void menu_page_exit()
+{
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+
+    page->current_item = 0;
+    page->top_index.current_value = 0;
+    page->shadow_top.current_value = 0;
+}
+
+//带有复选框的菜单项的按键响应函数
+void menu_item_contrl_check_toggle()
+{
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+
+    page->items[page->current_item].ctrl.is_checked = !page->items[page->current_item].ctrl.is_checked;
+}
+//带有弹窗的菜单项的按键响应函数
+void menu_item_contrl_num_change()
+{
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+//每次按下按键，弹窗的函数指针会发生变化
+    if(page->items[page->current_item].ctrl.on_click_pop == NULL)
+    {
+        page->items[page->current_item].ctrl.on_click_pop = page->realy_on_click_pop;
+    }
+    else
+    {
+        page->items[page->current_item].ctrl.on_click_pop = NULL;
+    }
+}
+//弹窗对编码器变化的响应函数
+void menu_item_on_click_pop(int32_t diff)
+{
+    menu_page *page;
+    page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
+
+    page->items[page->current_item].ctrl.pop_value += diff;
+    DrawfillRoundRect(22,10,70,30,5);
+    
+}
+
+uint8_t getDigitCount(int num) 
+{
+    int count = 0;
+    
+    // 处理负数
+    if (num < 0) {
+        num = -num;
+    }
+    if (num == 0) {
+        return 1;
+    }
+    while (num > 0) {
+        num /= 10; // 每次除以10，去掉最低位
+        count++;
+    }
+    return count;
+}
 void none(void)
 {
     

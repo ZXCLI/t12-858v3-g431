@@ -13,14 +13,14 @@ typedef struct animation animation;
 struct animation {
     uint32_t start_tick;          // 动画开始时间
     uint32_t current_tick;        // 当前时间
-    float current_value;          // 当前值
-    float start_value;            // 起始值
-    float value_span;             // 动画值变化的跨度
+    float current_value;          // 当前值，单位为一个item的高度
+    float start_value;            // 起始值，相对于行数来说
+    float value_span;             // 动画值变化的跨度，相对于行数来说
     uint32_t duration_tick;       // 动画持续时长（毫秒）
     bool done;                    // 是否完成
     void (*update)(animation *ani);  // 更新函数
     void (*set)(animation *ani, float value);  // 设置值函数
-    void (*transition)(animation *ani, float end_value, uint32_t duration_tick);  // 过渡函数
+    void (*transition)(animation *ani, float end_value, uint32_t duration_tick);  // 过渡函数,end_value为最终的菜单项下标
     void (*begin)(animation *ani, float start_value, float end_value, uint32_t duration_tick);  // 开始函数
 };
 

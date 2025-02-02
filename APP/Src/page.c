@@ -4,7 +4,7 @@ page_base *current_page;
 
 void route_to(page_base *new_page)
 {
-    if(current_page != NULL)
+    if((current_page != NULL) && (current_page->exit != NULL))
     {
         current_page->exit();
     }

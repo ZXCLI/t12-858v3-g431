@@ -358,7 +358,7 @@ void WriteByteBuffer(int page,int x,unsigned char byte)
 // 设置当前选择的缓冲区中某一个点的亮灭,bg,背景颜色,1为原色，0为反色
 void SetPointBuffer(uint8_t x, uint8_t y,uint8_t bg)
 {
-    if (x > SCREEN_COLUMN - 1 || y > SCREEN_ROW - 1) // 超出范围
+    if ((x > SCREEN_COLUMN - 1) || (y > SCREEN_ROW - 1)) // 超出范围
         return;
     if(bg){
         ScreenBuffer[y / SCREEN_PAGE_NUM][x] |= (1<<(y%SCREEN_PAGE_NUM));
@@ -557,7 +557,7 @@ void DrawFillRect1(int left,int top,int right,int bottom)
 	FillRect(left+1,top+1,right-left-1,bottom-top-1);	
 }
 //左上角坐标 矩形宽高
-void DrawRect2(int left,int top,int width,int height)
+void DrawRect2(uint8_t left,uint8_t top,uint8_t width,uint8_t height)
 {
 		DrawLine ( left, top, left+width-1, top );
 		DrawLine ( left, top+height-1 , left+width-1 , top+height-1 );
@@ -567,6 +567,8 @@ void DrawRect2(int left,int top,int width,int height)
 //填充矩形
 void DrawFillRect2(int left,int top,int width,int height)
 {
+    if(left>SCREEN_COLUMN ||top>SCREEN_ROW)
+    {return;}
 	//先用上面的函数画外框
 	DrawRect2(left,top,width,height);
 	//然后填充实心
@@ -576,7 +578,7 @@ void DrawFillRect2(int left,int top,int width,int height)
 //填充2个四分之一圆和中间的矩形
 //此函数专用于画圆角矩形
 //右上四分之一圆或左下四分之一圆的圆心 半径 中间矩形的高
-void DrawFillCircleHelper(int x0, int y0, unsigned char r, unsigned char cornername, int delta)
+void DrawFillCircleHelper(uint8_t x0, uint8_t y0, unsigned char r, unsigned char cornername, int delta)
 {
 	int f = 1 - r;
 	int ddF_x = 1;
@@ -626,7 +628,7 @@ void DrawRoundRect(uint8_t x, uint8_t y, unsigned char w, unsigned char h, unsig
 }
 
 //画实心圆角矩形
-void DrawfillRoundRect(int x, int y, unsigned char w, unsigned char h, unsigned char r)
+void DrawfillRoundRect(uint8_t x, uint8_t y, unsigned char w, unsigned char h, unsigned char r)
 {
   //画实心矩形
   DrawFillRect2(x+r, y, w-2*r, h);
