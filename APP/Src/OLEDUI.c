@@ -887,3 +887,35 @@ void DrawMYflaotRoundRect(int x, int y, uint8_t w, uint8_t h)
     DrawMYflaotRect(x+1, y+1, 1,h-2);
     DrawMYflaotRect(x+w-2, y+1, 1,h-2);
 }
+
+void MY_FillByte(int page,int x,unsigned  char byte)
+{
+	WriteByteBuffer(page,x,ReadByteBuffer(page,x)&(byte));
+
+	//WriteByteBuffer(page,x,ReadByteBuffer(page,x)&(~byte));
+}
+
+void MY_FillRect(int x,int y,int width,int height)
+{
+	int i,j;
+	int temp =(y+height-1)/8-y/8;	//需要填充的矩形在屏幕中所占的行数 屏幕被分为8大行
+	// if(x>SCREEN_COLUMN ||y>SCREEN_ROW)   
+	// 		return;
+	for(i=x; i<x+width&&i<128; i++)
+	{
+		if( temp==0 )
+		{
+			MY_FillByte(y/8,i,0);//_BitTableS[height-1]<<(y%8));
+		}
+		else
+		{
+			//从左往右 竖向填充
+			MY_FillByte(y/8,i,0);//_BitTableS[(8-y%8)-1]<<(y%8));
+			for(j=1;j<temp;j++)
+			{
+				MY_FillByte(y/8+j,i,0x00);
+			}
+			MY_FillByte(y/8+temp,i,0);//_BitTableS[(height-1+y)%8]);
+		}	
+	}
+}

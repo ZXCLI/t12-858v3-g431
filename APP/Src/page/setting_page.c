@@ -35,17 +35,19 @@ menu_item setting_page_items[]=
 
     },
     {
-        .text = "Choose Tips",
+        .text = "TEST POP",
         .on_enter = menu_item_contrl_num_change,
         .ctrl.is_visible = VISIBLE,
         .ctrl.check_box_or_pop = NUM,
-        // .ctrl.pop_value.update = animation_update,
-        // .ctrl.pop_value.transition = animation_transition,
-        // .ctrl.pop_value.set = animation_set,
+        .ctrl.min = 0,
+        .ctrl.max = 100,
     },
     {
-        .text = "Wipe All Data",
-        //.on_enter = on_enter_test1,
+        .text = "TEST CHECK",
+        .on_enter = menu_item_contrl_check_toggle, 
+        .ctrl.is_visible = VISIBLE,
+        .ctrl.check_box_or_pop = CHECK_BOX,
+        .ctrl.is_checked = CHECKED,
     },
     {
         .text = "About",
@@ -116,6 +118,6 @@ void setting_page_init()
     setting_page.top_index.set(&setting_page.top_index, 0 + setting_page.top_index.current_value);
     setting_page.shadow_top.set(&setting_page.shadow_top, header_height + setting_page.current_item * item_height);
     setting_page.shadow_bottom.set(&setting_page.shadow_bottom, (float)(item_height + header_height + 
-                                                                setting_page.current_item * item_height));
+                                                                        setting_page.current_item * item_height));
     setting_page.shadow_width.set(&setting_page.shadow_width, (float)setting_page.items[setting_page.current_item].width);
 }

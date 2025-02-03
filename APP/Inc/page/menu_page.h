@@ -36,6 +36,8 @@ typedef struct
     unsigned int check_box_or_pop : 1;//复选框或者数字弹出框,0复选框，1数字弹出框
     unsigned int is_checked : 1;//复选框是否选中,0未选中，1选中
     int32_t pop_value;//数字弹出框的值
+    int32_t min;//数字弹出框的最小值
+    int32_t max;//数字弹出框的最大值
     void (*on_click_pop)(int32_t diff);//弹出框回调函数
 }control;
 

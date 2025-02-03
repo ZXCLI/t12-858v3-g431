@@ -46,7 +46,7 @@ void menu_page_update_ui()
         shadow_height += biased_shadow_top;
         biased_shadow_top = 0;
     }
-    if((shadow_height > 0) && (page->items[page->current_item].ctrl.on_click_pop == NULL))
+    if(shadow_height > 0) //&& (page->items[page->current_item].ctrl.on_click_pop == NULL))
     {
         DrawMYfillRoundRect(2, biased_shadow_top, (uint16_t)(page->shadow_width.current_value), 
                             (uint16_t)shadow_height);
@@ -192,7 +192,7 @@ void menu_item_contrl_num_change()
 {
     menu_page *page;
     page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
-//每次按下按键，弹窗的函数指针会发生变化
+//每次按下按键，弹窗的函数指针会在NULL和真实的回调函数之间切换
     if(page->items[page->current_item].ctrl.on_click_pop == NULL)
     {
         page->items[page->current_item].ctrl.on_click_pop = page->realy_on_click_pop;
@@ -208,8 +208,23 @@ void menu_item_on_click_pop(int32_t diff)
     menu_page *page;
     page = container_of(current_page,menu_page,page);//获取当前页面的子类指针
 
-    page->items[page->current_item].ctrl.pop_value += diff;
-    DrawfillRoundRect(22,10,70,30,5);
+    int32_t temp_value = page->items[page->current_item].ctrl.pop_value + diff;
+    temp_value = (temp_value > page->items[page->current_item].ctrl.max) ? 
+                 page->items[page->current_item].ctrl.max : temp_value;//如果超出范围则返回最大值
+    temp_value = (temp_value < page->items[page->current_item].ctrl.min) ?
+                 page->items[page->current_item].ctrl.min : temp_value;//如果超出范围则返回最小值
+    page->items[page->current_item].ctrl.pop_value = temp_value;
+   
+    MY_FillRect(15,16,128-50,32);
+    DrawRect1(15,16,128-25,32+16);
+    DrawString(23,23,page->items[page->current_item].text,1);
+    DrawRect1(20,35,20+57,35+8);
+    DrawNum(27+50+4,36, page->items[page->current_item].ctrl.pop_value, 
+            getDigitCount(page->items[page->current_item].ctrl.pop_value), 1, 1);
+    uint16_t diff_value_max = page->items[page->current_item].ctrl.max - page->items[page->current_item].ctrl.min;
+    uint16_t diff_value = page->items[page->current_item].ctrl.pop_value - page->items[page->current_item].ctrl.min;
+    uint16_t diff_value_width = (uint16_t)((float)(diff_value * 57.0f) / (float)diff_value_max);//计算进度条长度
+    FillRect(20,35, diff_value_width, 8);
     
 }
 

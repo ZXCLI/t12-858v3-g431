@@ -49,7 +49,7 @@ void MY_Init(void)
     key_init();
 
     GlobalVariablesInit();          // 全局变量初始化
-    route_to(&(about_page_instance.page));
+    route_to(&(setting_page.page));
 }
 
 void MY_Loop(void)

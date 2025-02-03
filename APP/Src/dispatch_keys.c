@@ -15,19 +15,19 @@ void dispatch_keys(key_handle *key)
         if (keys_state[i].pressed)
         {
             if(key[i].on_pressed != NULL)
-            {key[i].on_pressed();} 
+                {key[i].on_pressed();} 
             KeyEvent[i].KeyPressed = false;
         }
         if (keys_state[i].shortPress)
         {
             if(key[i].on_short_pressed != NULL)
-            {key[i].on_short_pressed();}
+                {key[i].on_short_pressed();}
             KeyEvent[i].shortPress = false;
         }
         else if (keys_state[i].longPress)
         {
             if(key[i].on_long_pressed != NULL)
-            {key[i].on_long_pressed();}
+                {key[i].on_long_pressed();}
             KeyEvent[i].longPress = false;
         }
     }
