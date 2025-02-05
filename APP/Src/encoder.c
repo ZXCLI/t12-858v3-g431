@@ -63,7 +63,7 @@ void encoder_poll()
 void key_init()
 {
     shortpress_count = 200;
-    longpress_count = 12000; 
+    longpress_count = 8200; 
 }
 
 inline uint8_t key_read(uint8_t snack)

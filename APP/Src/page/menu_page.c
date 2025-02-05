@@ -17,7 +17,7 @@ void menu_page_update_ui()
     item_bottom -= rounded_offset_y;
     for(uint16_t i = floor(top_index_value); i < page->item_count; i++)
     {
-        DrawString(5, item_bottom + 4, page->items[i].text,item_height >> 4);
+        DrawString(5, item_bottom + 5, page->items[i].text,item_height >> 4);
         uint8_t temp_bit  = (page->items[i].ctrl.is_visible << 2) | 
                             (page->items[i].ctrl.check_box_or_pop << 1) | 
                             (page->items[i].ctrl.is_checked);

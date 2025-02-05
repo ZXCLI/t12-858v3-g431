@@ -31,7 +31,7 @@ menu_item setting_page_items[]=
 {
     {
         .text = "Return",
-        //.on_enter = menu_item_contrl_check_toggle,
+        .on_enter = on_enter_return,
 
     },
     {

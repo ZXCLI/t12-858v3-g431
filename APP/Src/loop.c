@@ -10,16 +10,16 @@ int8_t samplingDead = 16;
 //  */
 void MY_Init(void)
 {
-    //SPI2->CR1 &= ~SPI_CR1_BR;          // 设置spi分频系数为2
+    SPI2->CR1 &= ~SPI_CR1_BR;          // 设置spi分频系数为2
     __HAL_SPI_ENABLE(&hspi2);                                           	// 开启SPI
 
     OLED_Init();                                                        	// 初始化OLED
 
     EMAVG_reset(&Iron.lowpass);
-    EMAVG_reset(&Iron.lowpass_temp);
+    EMAVG_reset(&Iron.lowpass_temprature);
     EMAVG_reset(&Iron.lowpass_current);
     EMAVG_reset(&Gun.lowpass);
-    EMAVG_reset(&Gun.lowpass_temp);
+    EMAVG_reset(&Gun.lowpass_temprature);
     EMAVG_reset(&Gun.lowpass_current);
 
     DCL_resetPI(&Iron.DEvicePI);
@@ -49,13 +49,13 @@ void MY_Init(void)
     key_init();
 
     GlobalVariablesInit();          // 全局变量初始化
-    route_to(&(setting_page.page));
+    route_to(&(iron_page));
 }
 
 void MY_Loop(void)
 {
     current_page->update_ui();
-    __IO int32_t encoder_diff = EncoderEvent[ENCODER_1].count;
+    int32_t encoder_diff = EncoderEvent[ENCODER_1].count;
     if(encoder_diff != 0){
         EncoderEvent[ENCODER_1].count = 0;
         current_page->on_encoder_changed(-encoder_diff);
@@ -63,6 +63,23 @@ void MY_Loop(void)
     dispatch_keys(current_page->key_handlers);
 }
 
+void RunEMAVG_ShowOnScreen()
+{
+    EMAVG_run(&Iron.lowpass_temprature,Iron.Temp_really);
+    Iron.Temp_really = Iron.lowpass_temprature.out;
+    EMAVG_run(&Iron.lowpass_current,Iron.Current);
+    Iron.Current = Iron.lowpass_current.out;
+    EMAVG_run(&Gun.lowpass_temprature,Gun.Temp_really);
+    Gun.Temp_really = Gun.lowpass_temprature.out;
+    EMAVG_run(&Gun.lowpass_current,Gun.Current);
+    Gun.Current = Gun.lowpass_current.out;
+}
+
+void mapToRealValue()
+{
+    Iron.Temp_really = (uint16_t)(Iron.Temp_pu * 800.f);
+    Gun.Temp_really = (uint16_t)(Gun.Temp_pu * 800.f);
+}
 
 void GlobalVariablesInit(void)
 {
@@ -70,11 +87,11 @@ void GlobalVariablesInit(void)
     Iron.DEvicePI.Ki = 0.001f;
     Iron.DEvicePI.Umax = 0.99f;
     Iron.DEvicePI.Umin = 0.004f;
-    Iron.Temp_Ref_pu = 0.01f;
-    Iron.start = 1;
+    Iron.Temp_Ref_pu = 0.3f;
+    //Iron.start = 1;
 
-    EMAVG_config(&Iron.lowpass,0.05f);
-    EMAVG_config(&Iron.lowpass_temp,0.01f);
+    EMAVG_config(&Iron.lowpass,0.05f);//送入PI之前的滤波器
+    EMAVG_config(&Iron.lowpass_temprature,0.04f);//显示在屏幕上的数据的滤波器
     EMAVG_config(&Iron.lowpass_current,0.01f);
 }
 
@@ -93,7 +110,7 @@ inline void ADC_handle(void)
         //Iron.PwmPulse = IRON_PWM;
         IRON_PWM = MIN_CurrentPWM;
         FAN_PWM = MIN_CurrentPWM;
-        AUX_CHANNEL = MIN_CurrentPWM>>1;             // 下个周期测电流
+        AUX_CHANNEL = MIN_CurrentPWM >> 1;             // 下个周期测电流
     }else if(PWM_Count == 2){
         Iron.Current = IRON_Current_ADCRead;
         Gun.Current = FAN_Current_ADCRead;
@@ -107,12 +124,11 @@ inline void ADC_handle(void)
         Iron.Temp_Original = IRON_TEMP_ADCRead;
         Gun.Temp_Original = GUN_TEMP_ADCRead;
 
-        Iron.Temp_pu = Iron.Temp_Original / 4096.0f;
-        Gun.Temp_pu = Gun.Temp_Original / 4096.0f;
-
+        Iron.Temp_pu = (float)(Iron.Temp_Original) / 4096.0f;
+        Gun.Temp_pu = (float)(Gun.Temp_Original) / 4096.0f;
+        // 进行滤波
         EMAVG_run(&Iron.lowpass,Iron.Temp_pu);
         EMAVG_run(&Gun.lowpass,Gun.Temp_pu);
-
         Iron.Temp_pu = Iron.lowpass.out;
         Gun.Temp_pu = Gun.lowpass.out;
         // 进行环路计算
@@ -122,13 +138,16 @@ inline void ADC_handle(void)
         IRON_PWM = Iron.PwmPulse;
         FAN_PWM = Gun.PwmPulse;
         AUX_CHANNEL = (Iron.PwmPulse + 4) >> 1;            // 下个周期运行DEBUG程序
-        Iron.AdcReady = true;
-        Gun.AdcReady = true;
+
+        mapToRealValue();//归一化数据转换为实际数据
+        RunEMAVG_ShowOnScreen(); // 显示滤波后的数据
+
+        Iron.Ready = true;
+        Gun.Ready = true;
     }else if(PWM_Count == 10 + samplingDead){
-        SEGGER_RTT_printf(0,"%d,%d,%d\n",Iron.Temp_Original,Iron.PwmPulse,Iron.Connected*1000);
+        SEGGER_RTT_printf(0,"%d,%d,%d,%d\n",Iron.Temp_Original,Iron.Temp_really,Iron.PwmPulse,Iron.Connected*1000);
     }else if(PWM_Count == 400){
         PWM_Count -= 400;
     }
-
     PWM_Count++;
 }
